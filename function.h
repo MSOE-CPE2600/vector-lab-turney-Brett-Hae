@@ -1,6 +1,6 @@
 /**
  * function.h
- * Defines functions for vector calculator
+ * Defines functions for the vector calculator
  * Brett Haensgen
  * 9/30/2025
  * gcc main.c function.c menu.c -o output

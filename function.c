@@ -143,5 +143,6 @@ vector function(char *v1, char *v2, char *operand, vector vlist[]) {
 bool isFloat(char *str) {
     char *endptr;
     strtof(str, &endptr);
+    
     return endptr != str && *endptr == '\0';
 }
