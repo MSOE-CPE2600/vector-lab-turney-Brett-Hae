@@ -17,14 +17,19 @@
 #define VLIST_LENGTH 10
 
 int main(void) {
-    vector vlist[VLIST_LENGTH]; 
-    clear(vlist);
+    // Stores the vector list
+    vector vlist[VLIST_LENGTH]; //malloc, keep track of length and pass that around with ptr
+    clear(vlist); // may still want clear but different versions - one to handle after malloc/realloc, one for free (empty?)
+
+    // Stores user input
     char user_in[100];
     char* t1;
     char* t2;
     char* t3;
     char* t4;
     char* t5;
+
+    // Boolean that keeps program running until quit
     bool quit = false;
 
     // Repeats calculator functionality
@@ -63,6 +68,15 @@ int main(void) {
         } else if(strcmp(t1, "help") == 0) {
             // Help statement menu option
             help();
+        } else if(strcmp(t1, "fill") == 0) {
+            // Fill list menu option
+            fill(vlist);
+        } else if(t2 != NULL && strcmp(t1, "save") == 0) {
+            // Save to .csv menu option
+            save(t2, vlist);
+        } else if(t2 != NULL && strcmp(t1, "load") == 0) {
+            // Load .csv menu option
+            load(t2, vlist);
         } else if(t2 == NULL && findvect(vlist, t1) != -1) {
             // Single vector input print
             printvector(vlist[findvect(vlist, t1)]);
