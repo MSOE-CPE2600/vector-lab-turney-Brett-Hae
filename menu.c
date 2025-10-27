@@ -8,34 +8,40 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
 #include "vector.h"
 #include "menu.h"
 
-#define VLIST_LENGTH 10
 #define INPUT_LENGTH 50
 
 // list out all vectors stored in list
-void list(vector list[]){
-    for(int i = 0; i < VLIST_LENGTH; i++) {
+void list(vector* list, int size){
+    for(int i = 0; i < size; i++) {
         if(list[i].name[0] != '\0') {
             printf("%s = %f, %f, %f\n", list[i].name, list[i].x, list[i].y, list[i].z);
         }
     }
 }
 
-// Return 0-9 for vector position or -1 for full list
-int addvect(vector list[]) {
-    for(int i = 0; i < VLIST_LENGTH; i ++) {
-        if(strcmp(list[i].name, "\0") == 0) {
-            return i;
-        }
+// Adds a vector (used internally for both manual and file loads)
+vector* addvect(vector* list, int* size, vector v) {
+    vector* temp = realloc(list, (*size + 1) * sizeof(vector));
+    if (!temp) {
+        printf("Error in adding vector: memory allocation failed\n");
+        return list;
     }
-    return -1;
+
+    list = temp;
+    list[*size] = v;
+    (*size)++;
+    return list;
 }
 
 // Return 0-9 for vector position or -1 for not in list
-int findvect(vector list[], char* c) {
-    for(int i = 0; i < VLIST_LENGTH; i ++) {
+int findvect(vector* list, char* c, int size) {
+    for(int i = 0; i < size; i ++) {
         if(strcmp(list[i].name, c) == 0) {
             return i;
         }
@@ -44,15 +50,11 @@ int findvect(vector list[], char* c) {
 }
 
 // Clear out vector list
-void clear(vector list[]) {
-    vector v;
-    v.name[0] = '\0';
-    v.x = 0;
-    v.y = 0;
-    v.z = 0;
-    for(int i = 0; i < VLIST_LENGTH; i ++) {
-        list[i] = v;
-    }
+vector* clear(vector *list, int *size) {
+    free(list);
+    list = NULL;
+    (*size) = 0;
+    return list;
 }
 
 // Prints out guide to calculator functions (had to delete spaces because they would print)
@@ -85,7 +87,7 @@ void printvector(vector v) {
 }
 
 // Loads a .csv file to the vector list
-int load(char* filename, vector list[]) {
+int load(char* filename, vector **list, int *size) {
     char name[INPUT_LENGTH];
     strcpy(name, filename);
     checkExtension(name);
@@ -93,9 +95,11 @@ int load(char* filename, vector list[]) {
     FILE *fptr;
     fptr = fopen(name, "r");
     if(!fptr) {
-        perror("Error opening file for writing");
+        perror("Error in opening file: file not found");
         return 1;
     }
+
+    *list = clear(*list, size);
     
     char line[INPUT_LENGTH];
 
@@ -104,24 +108,18 @@ int load(char* filename, vector list[]) {
         vector v;
         line[strcspn(line, "\n")] = '\0';
         if (sscanf(line, "%[^,],%lf,%lf,%lf", v.name, &v.x, &v.y, &v.z) == 4) {
-            int pos = addvect(list);
-            if(pos == -1) {
-                printf("Error in adding vector: list full\n");
-            } else {
-                list[pos] = v;
-            }
+            *list = addvect(*list, size, v);
         } else {
             printf("Error in adding vector: line read failed\n");
         }
     }
-
     
     fclose(fptr);
     return 0;
 }
 
 // Saves a vector list to a .csv file
-int save(char* filename, vector list[]) {
+int save(char* filename, vector *list, int size) { 
     char name[INPUT_LENGTH];
     strcpy(name, filename);
     checkExtension(name);
@@ -129,11 +127,11 @@ int save(char* filename, vector list[]) {
     FILE *fptr;
     fptr = fopen(name, "w");
     if(!fptr) {
-        perror("Error opening file for writing");
+        perror("Error in opening file: file not found");
         return 1;
     }
 
-    for(int i = 0; i < VLIST_LENGTH; i++) {
+    for(int i = 0; i < size; i++) {
         if(list[i].name[0] != '\0') {
             fprintf(fptr, "%s,%f,%f,%f \n", list[i].name, list[i].x, list[i].y, list[i].z);
         }
@@ -153,6 +151,18 @@ void checkExtension(char* filename) {
 }
 
 // Fill out the list with randomly generated vectors
-int fill(vector list[]) {
-    return 0;
+vector* fill(vector *list, int *size, int count) {
+    srand((unsigned int)time(NULL));
+
+    for (int i = 0; i < count; i++) {
+        vector v;
+        snprintf(v.name, sizeof(v.name), "V%d", *size + 1);
+        v.x = (rand() % 2001 - 1000) / 10.0; // Random double between -100.0 and +100.0
+        v.y = (rand() % 2001 - 1000) / 10.0;
+        v.z = (rand() % 2001 - 1000) / 10.0;
+
+        list = addvect(list, size, v);
+    }
+
+    return list;
 }

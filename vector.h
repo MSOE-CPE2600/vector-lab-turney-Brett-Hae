@@ -7,7 +7,7 @@
  */
 
 typedef struct {
-    char name[10];
+    char name[15];
     double x;
     double y;
     double z;

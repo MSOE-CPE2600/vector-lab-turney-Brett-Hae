@@ -14,12 +14,10 @@
 #include "function.h"
 #include "menu.h"
 
-#define VLIST_LENGTH 10
-
 int main(void) {
     // Stores the vector list
-    vector vlist[VLIST_LENGTH]; //malloc, keep track of length and pass that around with ptr
-    clear(vlist); // may still want clear but different versions - one to handle after malloc/realloc, one for free (empty?)
+    vector* vlist = NULL;
+    int size = 0;
 
     // Stores user input
     char user_in[100];
@@ -58,28 +56,29 @@ int main(void) {
         if(strcmp(t1, "quit") == 0) {
             // Quit option
             quit = true;
+            free(vlist);
             printf("Goodbye\n");
         } else if(strcmp(t1, "list") == 0) {
             // List vectors menu option
-            list(vlist);
+            list(vlist, size);
         } else if(strcmp(t1, "clear") == 0) {
             // Clear list menu option
-            clear(vlist);
+            vlist = clear(vlist, &size);
         } else if(strcmp(t1, "help") == 0) {
             // Help statement menu option
             help();
-        } else if(strcmp(t1, "fill") == 0) {
+        } else if(strcmp(t1, "fill") == 0 && isNumber(t2)) {
             // Fill list menu option
-            fill(vlist);
+            vlist = fill(vlist, &size, atoi(t2));
         } else if(t2 != NULL && strcmp(t1, "save") == 0) {
             // Save to .csv menu option
-            save(t2, vlist);
+            save(t2, vlist, size);
         } else if(t2 != NULL && strcmp(t1, "load") == 0) {
             // Load .csv menu option
-            load(t2, vlist);
-        } else if(t2 == NULL && findvect(vlist, t1) != -1) {
+            load(t2, &vlist, &size);
+        } else if(t2 == NULL && findvect(vlist, t1, size) != -1) {
             // Single vector input print
-            printvector(vlist[findvect(vlist, t1)]);
+            printvector(vlist[findvect(vlist, t1, size)]);
         } else if(t2 == NULL) {
             // If no other single word commands worked, print error
             printf("Error on input: command doesn't exist\n");
@@ -87,50 +86,41 @@ int main(void) {
             // If equal sign in equation
             if(strcmp(t2, "=") == 0) {
                 // Try to find vector in list
-                int vect_pos = findvect(vlist, t1);
+                int vect_pos = findvect(vlist, t1, size);
 
                 // If vector does not exist in list add it
                 if(vect_pos == -1) {
-                    vect_pos = addvect(vlist);
-
-                    // Print error if list is full
-                    if(vect_pos == -1) {
-                        printf("Error in adding vector: list full\n");
-
-                    // Add vector to open position
-                    } else {
-                        vector result;
-                        strcpy(result.name, t1);
-                        vlist[vect_pos] = result;
-                    }
+                    vector v;
+                    strcpy(v.name, t1);
+                    vlist = addvect(vlist, &size, v);
                 } 
 
                 // If vector was found or added properly, continue to operand checking
-                if(vect_pos != -1) {
+                if(vect_pos != -1 || size != 0) {
                     // Assigning vector with 2 floats
                     if(isFloat(t3) && isFloat(t4) && t5 == NULL) {
-                        vlist[vect_pos].x = strtof(t3, NULL);
-                        vlist[vect_pos].y = strtof(t4, NULL);
-                        vlist[vect_pos].z = 0;
-                        printvector(vlist[vect_pos]);
+                        vlist[size-1].x = strtof(t3, NULL);
+                        vlist[size-1].y = strtof(t4, NULL);
+                        vlist[size-1].z = 0;
+                        printvector(vlist[size-1]);
 
                     // Assigning vector with 3 floats
                     } else if(isFloat(t3) && isFloat(t4) && isFloat(t5)) {
-                        vlist[vect_pos].x = strtof(t3, NULL);
-                        vlist[vect_pos].y = strtof(t4, NULL);
-                        vlist[vect_pos].z = strtof(t5, NULL);
-                        printvector(vlist[vect_pos]);
+                        vlist[size-1].x = strtof(t3, NULL);
+                        vlist[size-1].y = strtof(t4, NULL);
+                        vlist[size-1].z = strtof(t5, NULL);
+                        printvector(vlist[size-1]);
                     
                     // Go into function to calculate vector result and put result in list
                     } else {
-                        vector result = function(t3, t5, t4, vlist);
+                        vector result = function(t3, t5, t4, vlist, size);
 
                         // Check if vector calculation was successful (error vectors have null character name)
                         if(result.name[0] != '\0') {
-                            vlist[vect_pos].x = result.x;
-                            vlist[vect_pos].y = result.y;
-                            vlist[vect_pos].z = result.z;
-                            printvector(vlist[vect_pos]);
+                            vlist[size-1].x = result.x;
+                            vlist[size-1].y = result.y;
+                            vlist[size-1].z = result.z;
+                            printvector(vlist[size-1]);
                         }
                     }
                 }
@@ -139,8 +129,8 @@ int main(void) {
             } else {
                 // Check for dot product
                 if(strcmp(t2,".") == 0) {
-                    int v1_pos = findvect(vlist, t1);
-                    int v3_pos = findvect(vlist, t3);
+                    int v1_pos = findvect(vlist, t1, size);
+                    int v3_pos = findvect(vlist, t3, size);
 
                     // If either vector does not exist in list
                     if(v1_pos == -1 || v3_pos == -1) {
@@ -154,7 +144,7 @@ int main(void) {
                 
                     // Go into function to calculate vector result and print result
                 } else {
-                    vector result = function(t1, t3, t2, vlist);
+                    vector result = function(t1, t3, t2, vlist, size);
 
                     // Check if vector calculation was successful (error vectors have null character name)
                     if(result.name[0] != '\0') {

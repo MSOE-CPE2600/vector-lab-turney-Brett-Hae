@@ -67,7 +67,7 @@ vector cross(vector a, vector b) {
 }
 
 // Selects which operationn should be done if valid
-vector function(char *v1, char *v2, char *operand, vector vlist[]) {
+vector function(char *v1, char *v2, char *operand, vector *vlist, int size) {
     // Creates blank vector result
     vector result = { .x = 0, .y = 0, .z = 0 };
 
@@ -80,7 +80,7 @@ vector function(char *v1, char *v2, char *operand, vector vlist[]) {
                 result.name[0] = '\0';
             } else {
                 // v2 is the scalar
-                int v1_pos = findvect(vlist, v1);
+                int v1_pos = findvect(vlist, v1, size);
 
                 // If vector is not found, print error and assign null character error name
                 if(v1_pos == -1) {
@@ -93,7 +93,7 @@ vector function(char *v1, char *v2, char *operand, vector vlist[]) {
             }
         } else {
             // v1 is the scalar
-            int v2_pos = findvect(vlist, v2);
+            int v2_pos = findvect(vlist, v2, size);
 
             // If vector is not found, print error and assign null character error name
             if(v2_pos == -1) {
@@ -108,8 +108,8 @@ vector function(char *v1, char *v2, char *operand, vector vlist[]) {
     // Checks for other possible operators
     } else if(strcmp(operand,"-") == 0 || strcmp(operand,"+") == 0 || strcmp(operand,"x") == 0) {
         // Finds the two inputted vectors
-        int v1_pos = findvect(vlist, v1);
-        int v2_pos = findvect(vlist, v2);
+        int v1_pos = findvect(vlist, v1, size);
+        int v2_pos = findvect(vlist, v2, size);
 
         // If vectors are not found, print error and assign null character error name
         if(v1_pos == -1 || v2_pos == -1) {
@@ -145,4 +145,14 @@ bool isFloat(char *str) {
     strtof(str, &endptr);
     
     return endptr != str && *endptr == '\0';
+}
+
+int isNumber(char *token) {
+    if (token == NULL || *token == '\0') return 0; // empty string check
+    for (int i = 0; token[i] != '\0'; i++) {
+        if (!isdigit((unsigned char)token[i])) {
+            return 0; // non-digit found
+        }
+    }
+    return 1; // all digits
 }

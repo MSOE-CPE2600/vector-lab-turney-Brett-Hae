@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -lc -Wall
+CFLAGS=-c -lc -Wall -g
 LDFLAGS=
 SOURCES= main.c function.c menu.c
 OBJECTS=$(SOURCES:.c=.o)

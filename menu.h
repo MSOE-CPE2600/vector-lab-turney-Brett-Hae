@@ -6,13 +6,13 @@
  * gcc main.c function.c menu.c -o output
  */
 
-void list(vector list[]);
-int addvect(vector list[]);
-int findvect(vector list[], char* c);
-void clear(vector list[]);
+void list(vector *list, int size);
+vector* addvect(vector *list, int *size, vector v);
+int findvect(vector *list, char* c, int size);
+vector* clear(vector *list, int *size);
 void help(void);
 void printvector(vector v);
-int load(char filename[], vector list[]);
-int save(char* filename, vector list[]);
+int load(char filename[], vector **list, int *size);
+int save(char* filename, vector *list, int size);
 void checkExtension(char* filename);
-int fill(vector list[]);
+vector* fill(vector *list, int *size, int count);
