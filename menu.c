@@ -16,7 +16,7 @@
 
 #define INPUT_LENGTH 50
 
-// list out all vectors stored in list
+// List out all vectors stored in list
 void list(vector* list, int size){
     for(int i = 0; i < size; i++) {
         if(list[i].name[0] != '\0') {
@@ -25,7 +25,7 @@ void list(vector* list, int size){
     }
 }
 
-// Adds a vector (used internally for both manual and file loads)
+// Adds a vector to the list
 vector* addvect(vector* list, int* size, vector v) {
     vector* temp = realloc(list, (*size + 1) * sizeof(vector));
     if (!temp) {
@@ -39,7 +39,7 @@ vector* addvect(vector* list, int* size, vector v) {
     return list;
 }
 
-// Return 0-9 for vector position or -1 for not in list
+// Return number for vector position or -1 for not in list
 int findvect(vector* list, char* c, int size) {
     for(int i = 0; i < size; i ++) {
         if(strcmp(list[i].name, c) == 0) {
@@ -88,10 +88,12 @@ void printvector(vector v) {
 
 // Loads a .csv file to the vector list
 int load(char* filename, vector **list, int *size) {
+    // Tkaes in name and checks for extenson
     char name[INPUT_LENGTH];
     strcpy(name, filename);
     checkExtension(name);
 
+    // Opens file
     FILE *fptr;
     fptr = fopen(name, "r");
     if(!fptr) {
@@ -99,11 +101,12 @@ int load(char* filename, vector **list, int *size) {
         return 1;
     }
 
+    // Cleans the list out before adding the new vectors
     *list = clear(*list, size);
     
     char line[INPUT_LENGTH];
 
-    // Read each line
+    // Read each line for vectors preformatted
     while (fgets(line, INPUT_LENGTH, fptr)) {
         vector v;
         line[strcspn(line, "\n")] = '\0';
@@ -120,10 +123,12 @@ int load(char* filename, vector **list, int *size) {
 
 // Saves a vector list to a .csv file
 int save(char* filename, vector *list, int size) { 
+    // Takes in name and checks for extension
     char name[INPUT_LENGTH];
     strcpy(name, filename);
     checkExtension(name);
 
+    // Opens file
     FILE *fptr;
     fptr = fopen(name, "w");
     if(!fptr) {
@@ -131,6 +136,7 @@ int save(char* filename, vector *list, int size) {
         return 1;
     }
 
+    // Saves all the vectors from the list to the file
     for(int i = 0; i < size; i++) {
         if(list[i].name[0] != '\0') {
             fprintf(fptr, "%s,%f,%f,%f \n", list[i].name, list[i].x, list[i].y, list[i].z);
@@ -143,14 +149,14 @@ int save(char* filename, vector *list, int size) {
 
 // Ensures filename ends with ".csv"
 void checkExtension(char* filename) {
-    const char* dot = strrchr(filename, '.');
+    char* dot = strrchr(filename, '.');
 
     if (!dot || strcmp(dot, ".csv") != 0) {
         strcat(filename, ".csv");
     }
 }
 
-// Fill out the list with randomly generated vectors
+// Fill out the list with randomly generated vectors - partial credit to google
 vector* fill(vector *list, int *size, int count) {
     srand((unsigned int)time(NULL));
 

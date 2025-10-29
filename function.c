@@ -139,7 +139,7 @@ vector function(char *v1, char *v2, char *operand, vector *vlist, int size) {
     return result;
 }
 
-// Checks if the passed string is a float
+// Checks if the passed string is a float - credit to google
 bool isFloat(char *str) {
     char *endptr;
     strtof(str, &endptr);
@@ -147,12 +147,15 @@ bool isFloat(char *str) {
     return endptr != str && *endptr == '\0';
 }
 
-int isNumber(char *token) {
-    if (token == NULL || *token == '\0') return 0; // empty string check
-    for (int i = 0; token[i] != '\0'; i++) {
-        if (!isdigit((unsigned char)token[i])) {
-            return 0; // non-digit found
+// Checks if passed string is a number - credit to google
+bool isNumber(char *str) {
+    if (str == NULL || *str == '\0') {
+        return 0; // empty string check
+    }
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (!isdigit((unsigned char)str[i])) {
+            return false; // non-digit found
         }
     }
-    return 1; // all digits
+    return true; // all digits
 }

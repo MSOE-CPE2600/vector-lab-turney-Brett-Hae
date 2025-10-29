@@ -3,7 +3,7 @@ CFLAGS=-c -lc -Wall -g
 LDFLAGS=
 SOURCES= main.c function.c menu.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=output
+EXECUTABLE=vectorlab
 
 all: $(SOURCES) $(EXECUTABLE)
 

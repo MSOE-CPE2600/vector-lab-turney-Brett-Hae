@@ -15,4 +15,4 @@ double dot(vector a, vector b);
 vector cross(vector a, vector b);
 vector function(char *v1, char *v2, char *operand, vector *vlist, int size);
 bool isFloat(char *str);
-int isNumber(char *token);
+bool isNumber(char *str);

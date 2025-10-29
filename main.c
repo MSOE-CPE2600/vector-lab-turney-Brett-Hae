@@ -67,9 +67,13 @@ int main(void) {
         } else if(strcmp(t1, "help") == 0) {
             // Help statement menu option
             help();
-        } else if(strcmp(t1, "fill") == 0 && isNumber(t2)) {
+        } else if(strcmp(t1, "fill") == 0) {
             // Fill list menu option
-            vlist = fill(vlist, &size, atoi(t2));
+            if(isNumber(t2)) {
+                vlist = fill(vlist, &size, atoi(t2));
+            } else {
+                vlist = fill(vlist, &size, 100);
+            }
         } else if(t2 != NULL && strcmp(t1, "save") == 0) {
             // Save to .csv menu option
             save(t2, vlist, size);
